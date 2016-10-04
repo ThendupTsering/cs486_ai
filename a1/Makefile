@@ -1,12 +1,3 @@
-CXX=g++
-XXFLAGS= -Wall -MMD
-EXEC=parser
-OBJECTS=parser.o
-DEPENDS=${OBJECTS:.o=.d}
-
-${EXEC}: ${OBJECTS}
-	${CXX} ${XXFLAGS} ${OBJECTS} -o ${EXEC}
--include ${DEPENDS}
-
-clean:
-	rm ${OBJECTS} ${EXEC}
+parser:
+	javac -d out src/*.java
+	java -classpath out parser.ParserMain
