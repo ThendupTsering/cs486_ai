@@ -10,23 +10,37 @@ import java.util.List;
  */
 public class Parser {
 
-    public Parser() {
+    public Parser(String startingWord, String[] sentenceSpec) {
+        this.startingWord = startingWord;
+        this.sentenceSpec = sentenceSpec;
+        for (int i = 0; i < sentenceSpec.length-1; i++) {
+            this.sentenceSpecMap.put(sentenceSpec[i], sentenceSpec[i+1]);
+        }
     }
 
-    public Map<String, Map<String, Node>> mapMain = new HashMap<String, Map<String, Node>>();
-    public Map <String, Float> wordsWithProbabilities = new HashMap<>();
-    public int nodesVisited = 0;
+    public Map<String, Map<String, Node>> mapMain = new HashMap<>();
+    public String startingWord;
+    public String[] sentenceSpec;
+    public Map<String, String> sentenceSpecMap = new HashMap<>();
+    public Map<String, Node> parseMap = new HashMap<>();
 
     public void addToMap(String word1, String partOfSpeech1, String word2, String partOfSpeech2, float probability) {
         Map <String, Node> map;
         if (this.mapMain.get(word1) != null) {
             map = this.mapMain.get(word1);
         } else {
-            map = new HashMap <String, Node>();
+            map = new HashMap <>();
         }
-        Node node = new Node(partOfSpeech1, partOfSpeech2, probability);
-        map.put(word2, node);
-        this.mapMain.put(word1, map);
+
+        String partOfSpeech2Check = this.sentenceSpecMap.get(partOfSpeech1);
+        if (partOfSpeech2Check != null) {
+            if (partOfSpeech2Check.equals(partOfSpeech2)) {
+                Node node = new Node(partOfSpeech1, partOfSpeech2, probability);
+                map.put(word2, node);
+                this.mapMain.put(word1, map);
+//                System.out.println("Found " + partOfSpeech1 + ", " + partOfSpeech2);
+            }
+        }
     }
 
     public float getProbability(String word1, String word2) {
@@ -45,19 +59,9 @@ public class Parser {
         return this.mapMain.get(word1);
     }
 
-//    public void generateHelper(String word1, String partOfSpeech2, int index) {
-//
-//
-//        for (Map.Entry<String,Node> entry : mapValues.entrySet()) {
-//            String word2 = entry.getKey();
-//            Node word2Values = entry.getValue();
-//        }
-//
-//    }
-
     public ArrayList<String> getNextWords(String word1) {
         Map <String, Node> mapValues = this.getValues(word1);
-        ArrayList<String> output = new ArrayList<String>();
+        ArrayList<String> output = new ArrayList<>();
         String word2 = "";
         for (Map.Entry<String,Node> entry : mapValues.entrySet()) {
             word2 = entry.getKey();
@@ -65,5 +69,17 @@ public class Parser {
         }
         return output;
     }
+
+    public void parseFrom(String word1) {
+        ArrayList <String> word2s = this.getNextWords(word1);
+        for (String word2: word2s) {
+            System.out.println(word1);
+            System.out.println(word2);
+            System.out.println(this.getPartOfSpeech1(word1, word2));
+            System.out.println(this.getPartOfSpeech2(word1, word2));
+            System.out.println(this.getProbability(word1, word2));
+        }
+    }
+
 
 }
