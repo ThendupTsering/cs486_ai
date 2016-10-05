@@ -14,15 +14,22 @@ public class Parser {
         this.startingWord = startingWord;
         this.sentenceSpec = sentenceSpec;
         for (int i = 0; i < sentenceSpec.length-1; i++) {
-            this.sentenceSpecMap.put(sentenceSpec[i], sentenceSpec[i+1]);
+            if (this.sentenceSpecMap.get(sentenceSpec[i]) == null) {
+                ArrayList<String> newList = new ArrayList<>();
+                newList.add(0, sentenceSpec[i+1]);
+                this.sentenceSpecMap.put(sentenceSpec[i], newList);
+            } else {
+                ArrayList<String> existingList = this.sentenceSpecMap.get(sentenceSpec[i]);
+                existingList.add(existingList.size(), sentenceSpec[i+1]);
+                this.sentenceSpecMap.put(sentenceSpec[i], existingList);
+            }
         }
     }
 
     public Map<String, Map<String, Node>> mapMain = new HashMap<>();
     public String startingWord;
     public String[] sentenceSpec;
-    public Map<String, String> sentenceSpecMap = new HashMap<>();
-    public Map<String, Node> parseMap = new HashMap<>();
+    public Map<String, ArrayList<String>> sentenceSpecMap = new HashMap<>();
 
     public void addToMap(String word1, String partOfSpeech1, String word2, String partOfSpeech2, float probability) {
         Map <String, Node> map;
@@ -32,15 +39,23 @@ public class Parser {
             map = new HashMap <>();
         }
 
-        String partOfSpeech2Check = this.sentenceSpecMap.get(partOfSpeech1);
-        if (partOfSpeech2Check != null) {
-            if (partOfSpeech2Check.equals(partOfSpeech2)) {
-                Node node = new Node(partOfSpeech1, partOfSpeech2, probability);
-                map.put(word2, node);
-                this.mapMain.put(word1, map);
-//                System.out.println("Found " + partOfSpeech1 + ", " + partOfSpeech2);
+        if (this.checkSpecIsValid(partOfSpeech1, partOfSpeech2)) {
+            Node node = new Node(partOfSpeech1, partOfSpeech2, probability);
+            map.put(word2, node);
+            this.mapMain.put(word1, map);
+            System.out.println("Found " + partOfSpeech1 + ", " + partOfSpeech2);
+            System.out.println("which is " + word1 + ", " + word2);
+        }
+    }
+
+    private boolean checkSpecIsValid(String partOfSpeech1, String partOfSpeech2) {
+        boolean valid = false;
+        if (this.sentenceSpecMap.get(partOfSpeech1) != null) {
+            for(String s: this.sentenceSpecMap.get(partOfSpeech1)) {
+                if (s.equals(partOfSpeech2)) { valid = true; }
             }
         }
+        return valid;
     }
 
     public float getProbability(String word1, String word2) {
