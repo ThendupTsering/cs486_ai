@@ -15,15 +15,15 @@ public class Parser {
         this.startingWord = startingWord;
         this.sentenceSpec = sentenceSpec;
         for (int i = 0; i < sentenceSpec.length-1; i++) {
-            if (this.sentenceSpecMap.get(sentenceSpec[i]) == null) {
+//            if (this.sentenceSpecMap.get(sentenceSpec[i]) == null) {
                 ArrayList<String> newList = new ArrayList<>();
                 newList.add(0, sentenceSpec[i+1]);
                 this.sentenceSpecMap.put(sentenceSpec[i], newList);
-            } else {
-                ArrayList<String> existingList = this.sentenceSpecMap.get(sentenceSpec[i]);
-                existingList.add(existingList.size(), sentenceSpec[i+1]);
-                this.sentenceSpecMap.put(sentenceSpec[i], existingList);
-            }
+//            } else {
+//                ArrayList<String> existingList = this.sentenceSpecMap.get(sentenceSpec[i]);
+//                existingList.add(existingList.size(), sentenceSpec[i+1]);
+//                this.sentenceSpecMap.put(sentenceSpec[i], existingList);
+//            }
         }
     }
 
@@ -34,7 +34,7 @@ public class Parser {
     public ArrayList<Sequence> validSequences = new ArrayList<>();
     public int nodesConsidered = 0;
 
-    public void parseGraph(String graph) {
+    public void parseGraphToMainMap(String graph) {
         try (Stream<String> stream = Files.lines(Paths.get(graph))) {
             for (Iterator<String> i = stream.iterator(); i.hasNext(); ) {
                 String line = i.next();
@@ -78,7 +78,7 @@ public class Parser {
         return valid;
     }
 
-    public void findSequences() {
+    public void findSequencesBFS() {
         Map <String, Node> mapValues = this.getValues(this.startingWord);
         Map.Entry<String, Node> firstEntry = mapValues.entrySet().iterator().next();
         String partOfSpeech1 = firstEntry.getValue().partOfSpeech1;
@@ -96,6 +96,28 @@ public class Parser {
                 }
             }
         }
+    }
+
+    public void findSequencesDFS(){
+//        Map <String, Node> mapValues = this.getValues(this.startingWord);
+//        Map.Entry<String, Node> firstEntry = mapValues.entrySet().iterator().next();
+//        String partOfSpeech1 = firstEntry.getValue().partOfSpeech1;
+//        Stack<Sequence> sequenceStack = new Stack<Sequence>();
+//
+//        if (partOfSpeech1.equals(this.sentenceSpec[0])) {
+//            for (int i = 0; i < this.sentenceSpec.length-1; i++) {
+//                if (i == 0) {
+//                    Sequence s = new Sequence(this.startingWord, partOfSpeech1, 1, 1);
+//                    sequenceStack.push(s);
+//                }
+//                //sequenceStack.push()
+//            }
+//        }
+        System.out.println("DFS Search");
+    }
+
+    public void findSequencesHS(){
+        System.out.println("HS Search");
     }
 
     public float getProbability(String word1, String word2) {
@@ -153,6 +175,18 @@ public class Parser {
     public void printSequences() {
         for (Sequence s: this.validSequences) {
             s.printSequence();
+        }
+    }
+
+    public void printSentenceSpecMap() {
+        for (String i: sentenceSpec) {
+            System.out.println(i);
+            if (sentenceSpecMap.get(i) != null) {
+                for (String j: sentenceSpecMap.get(i)) {
+                    System.out.println(j);
+                }
+            }
+            System.out.println();
         }
     }
 
