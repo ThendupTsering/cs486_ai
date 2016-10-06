@@ -14,23 +14,11 @@ public class Parser {
     public Parser(String startingWord, String[] sentenceSpec) {
         this.startingWord = startingWord;
         this.sentenceSpec = sentenceSpec;
-        for (int i = 0; i < sentenceSpec.length-1; i++) {
-//            if (this.sentenceSpecMap.get(sentenceSpec[i]) == null) {
-                ArrayList<String> newList = new ArrayList<>();
-                newList.add(0, sentenceSpec[i+1]);
-                this.sentenceSpecMap.put(sentenceSpec[i], newList);
-//            } else {
-//                ArrayList<String> existingList = this.sentenceSpecMap.get(sentenceSpec[i]);
-//                existingList.add(existingList.size(), sentenceSpec[i+1]);
-//                this.sentenceSpecMap.put(sentenceSpec[i], existingList);
-//            }
-        }
     }
 
     public Map<String, Map<String, Node>> mapMain = new HashMap<>(); // only has valid sentence spec lines
     public String startingWord;
     public String[] sentenceSpec;
-    public Map<String, ArrayList<String>> sentenceSpecMap = new HashMap<>();
     public ArrayList<Sequence> validSequences = new ArrayList<>();
     public int nodesConsidered = 0;
 
@@ -70,9 +58,9 @@ public class Parser {
 
     private boolean checkSpecIsValid(String partOfSpeech1, String partOfSpeech2) {
         boolean valid = false;
-        if (this.sentenceSpecMap.get(partOfSpeech1) != null) {
-            for(String s: this.sentenceSpecMap.get(partOfSpeech1)) {
-                if (s.equals(partOfSpeech2)) { valid = true; }
+        for (int i = 0; i < sentenceSpec.length-1; i++) {
+            if (partOfSpeech1.equals(sentenceSpec[i]) && partOfSpeech2.equals(sentenceSpec[i+1])) {
+                valid = true;
             }
         }
         return valid;
@@ -155,9 +143,19 @@ public class Parser {
             Sequence s = new Sequence(seq.sentence, seq.sentenceSpec, seq.level, seq.probability);
             float probabilityOfWord2 = this.getProbability(seq.lastWord, word2);
             s = s.addWordToSequence(word2, this.getPartOfSpeech2(seq.lastWord, word2), probabilityOfWord2);
-            this.nodesConsidered++;
-            this.validSequences.add(this.validSequences.size(), s);
+            if (isSequenceValid(s)) {
+                this.validSequences.add(this.validSequences.size(), s);
+            }
         }
+    }
+
+    public boolean isSequenceValid(Sequence seq) {
+        boolean valid = true;
+        String[] seqArray = seq.sentenceSpec.split("-");
+        for (int i = 0; i < seqArray.length; i++) {
+            if (!seqArray[i].equals(this.sentenceSpec[i])) { valid = false; }
+        }
+        return valid;
     }
 
     public Sequence getBestSequence(int level) {
@@ -168,6 +166,7 @@ public class Parser {
                 probSoFar = s.probability;
                 best = s;
             }
+            this.nodesConsidered++;
         }
         return best;
     }
@@ -177,18 +176,5 @@ public class Parser {
             s.printSequence();
         }
     }
-
-    public void printSentenceSpecMap() {
-        for (String i: sentenceSpec) {
-            System.out.println(i);
-            if (sentenceSpecMap.get(i) != null) {
-                for (String j: sentenceSpecMap.get(i)) {
-                    System.out.println(j);
-                }
-            }
-            System.out.println();
-        }
-    }
-
 
 }

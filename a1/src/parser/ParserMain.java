@@ -23,8 +23,6 @@ public class ParserMain {
 			parser.findSequencesHS();
 		}
 
-//		parser.printSentenceSpecMap();
-
 //		parser.printSequences();
 
 		Sequence best = parser.getBestSequence(sentenceSpec.length);
