@@ -124,9 +124,9 @@ public class Parser {
                         float probabilityOfWord2 = this.getProbability(s.lastWord, word2);
                         s = s.addWordToSequence(word2, this.getPartOfSpeech2(s.lastWord, word2), probabilityOfWord2);
                     }
-
                 } else {
                     s.removeWordFromSequence();
+                    levelCounters.set(s.level+1, 0);
                     levelCounters.set(s.level, levelCounters.get(s.level)+1);
                 }
             }
@@ -145,20 +145,22 @@ public class Parser {
         ArrayList<Float> probabilityArray = new ArrayList<>();
         Sequence s = new Sequence(this.startingWord, partOfSpeech1, 1, 1, probabilityArray);
 
-        for (int i = 1; i < sentenceSpec.length; i++){
-            for (Map.Entry<String, Node> entry : mapValues.entrySet()) {
-                if (sentenceSpec[i].equals(entry.getValue().partOfSpeech2)) {
-                    nodesConsidered++;
-                    if (entry.getValue().probability > greatestProbabilitySoFar) {
-                        greatestProbabilitySoFar = entry.getValue().probability;
-                        nextWordSoFar = entry.getKey();
-                        nextNodeSoFar = entry.getValue();
+        for (int i = 1; i < sentenceSpec.length; i++) {
+            if (mapValues != null) {
+                for (Map.Entry<String, Node> entry : mapValues.entrySet()) {
+                    if (sentenceSpec[i].equals(entry.getValue().partOfSpeech2)) {
+                        nodesConsidered++;
+                        if (entry.getValue().probability > greatestProbabilitySoFar) {
+                            greatestProbabilitySoFar = entry.getValue().probability;
+                            nextWordSoFar = entry.getKey();
+                            nextNodeSoFar = entry.getValue();
+                        }
                     }
                 }
+                s = s.addWordToSequence(nextWordSoFar, nextNodeSoFar.partOfSpeech2, nextNodeSoFar.probability);
+                greatestProbabilitySoFar = 0;
+                mapValues = this.getValues(nextWordSoFar);
             }
-            s = s.addWordToSequence(nextWordSoFar, nextNodeSoFar.partOfSpeech2, nextNodeSoFar.probability);
-            greatestProbabilitySoFar = 0;
-            mapValues = this.getValues(nextWordSoFar);
         }
         return s;
     }
@@ -167,20 +169,7 @@ public class Parser {
         return (this.mapMain.get(word1).get(word2).probability);
     }
 
-//    public String getPartOfSpeech1(String word1, String word2) {
-//        return this.mapMain.get(word1).get(word2).partOfSpeech1;
-//    }
-
-    public float multiplyProbArray(ArrayList<Float> arr) {
-        float prob = 1;
-        for (float p: arr) {
-            prob = prob * p;
-        }
-        return prob;
-    }
-
-
-        public String getPartOfSpeech2(String word1, String word2) {
+    public String getPartOfSpeech2(String word1, String word2) {
         return this.mapMain.get(word1).get(word2).partOfSpeech2;
     }
 

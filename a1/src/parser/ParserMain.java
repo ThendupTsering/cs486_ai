@@ -44,6 +44,9 @@ public class ParserMain {
 		String graph = "input.txt";
 		String[] searchStrategies = {"BREADTH_FIRST", "DEPTH_FIRST", "HEURISTIC"};
 
+		System.out.println("**************** BREADTH FIRST *******************");
+		System.out.println();
+
 		// Part 1
 		String startingWord = "hans";
 		String[] sentenceSpec = {"NNP", "VBD", "DT", "NN"};
@@ -79,18 +82,66 @@ public class ParserMain {
 		System.out.println(output4);
 		System.out.println();
 
+
+		System.out.println();
+		System.out.println("**************** DEPTH FIRST *******************");
+		System.out.println();
+
 		// Part 3 DEPTH FIRST
-		String startingWordDPS = "hans";
-		String[] sentenceSpecDPS = {"NNP", "VBD", "DT", "NN"};
-		String outputDPS = generate(startingWordDPS, sentenceSpecDPS, searchStrategies[1], graph);
+		String outputDPS = generate(startingWord, sentenceSpec, searchStrategies[1], graph);
 		System.out.println(outputDPS);
 		System.out.println();
 
+		// Part 3.1
+		String outputDPS1 = generate(startingWord1, sentenceSpec1, searchStrategies[1], graph);
+		System.out.println(outputDPS1);
+		System.out.println();
+
+		// Part 3.2
+		String outputDPS2 = generate(startingWord2, sentenceSpec2, searchStrategies[1], graph);
+		System.out.println(outputDPS2);
+		System.out.println();
+
+		// Part 3.3
+		String outputDPS3 = generate(startingWord3, sentenceSpec3, searchStrategies[1], graph);
+		System.out.println(outputDPS3);
+		System.out.println();
+
+//		// Part 3.4
+//		String outputDPS4= generate(startingWord4, sentenceSpec4, searchStrategies[1], graph);
+//		System.out.println(outputDPS4);
+//		System.out.println();
+
+
+		System.out.println();
+		System.out.println("**************** HEURISTIC *******************");
+		System.out.println();
+
 		// Part 4 HEURISTIC
-		String startingWordHS = "hans";
-		String[] sentenceSpecHS = {"NNP", "VBD", "DT", "NN"};
-		String outputHS = generate(startingWordHS, sentenceSpecHS, searchStrategies[2], graph);
+		String outputHS = generate(startingWord, sentenceSpec, searchStrategies[2], graph);
 		System.out.println(outputHS);
 		System.out.println();
+
+		// Part 4.1
+		String outputHS1 = generate(startingWord1, sentenceSpec1, searchStrategies[2], graph);
+		System.out.println(outputHS1);
+		System.out.println();
+
+		// Part 4.2
+		String outputHS2 = generate(startingWord2, sentenceSpec2, searchStrategies[2], graph);
+		System.out.println(outputHS2);
+		System.out.println();
+
+		// Part 4.3
+		String outputHS3 = generate(startingWord3, sentenceSpec3, searchStrategies[2], graph);
+		System.out.println(outputHS3);
+		System.out.println();
+
+		// Part 4.4
+		String outputHS4= generate(startingWord4, sentenceSpec4, searchStrategies[2], graph);
+		System.out.println(outputHS4);
+		System.out.println();
+
+
 	}
 }
