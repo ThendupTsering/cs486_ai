@@ -25,8 +25,10 @@ public class ParserMain {
 			parser.findSequencesDFS();
 			output = "";
 		} else { // HEURISTIC
-			parser.findSequencesHS();
-			output = "";
+			Sequence sentence = parser.findSequencesHS();
+			String sentenceProbability = String.format("%.12f", sentence.probability);
+			output = "\"" + sentence.sentence + "\"" + " with probability " + sentenceProbability
+					+ "\nTotal nodes considered: " + parser.nodesConsidered;
 		}
 
 //		parser.printSequences();
@@ -74,17 +76,17 @@ public class ParserMain {
 //		System.out.println(output4);
 
 		// Part 3 DEPTH FIRST
-		String startingWordDPS = "hans";
-		String[] sentenceSpecDPS = {"NNP", "VBD", "DT"};
-		String outputDPS = generate(startingWordDPS, sentenceSpecDPS, searchStrategies[1], graph);
-		System.out.println(outputDPS);
-		System.out.println();
+//		String startingWordDPS = "hans";
+//		String[] sentenceSpecDPS = {"NNP", "VBD", "DT", "NN"};
+//		String outputDPS = generate(startingWordDPS, sentenceSpecDPS, searchStrategies[1], graph);
+//		System.out.println(outputDPS);
+//		System.out.println();
 //
 //		// Part 3 HEURISTIC
-//		String startingWordHS = "hans";
-//		String[] sentenceSpecHS = {"NNP", "VBD", "DT", "NN"};
-//		String outputHS = generate(startingWordHS, sentenceSpecHS, searchStrategies[2], graph);
-//		System.out.println(outputHS);
-//		System.out.println();
+		String startingWordHS = "hans";
+		String[] sentenceSpecHS = {"NNP", "VBD", "DT", "NN"};
+		String outputHS = generate(startingWordHS, sentenceSpecHS, searchStrategies[2], graph);
+		System.out.println(outputHS);
+		System.out.println();
 	}
 }

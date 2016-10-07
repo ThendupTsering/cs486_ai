@@ -66,7 +66,7 @@ public class Parser {
         return valid;
     }
 
-    public void findSequencesBFS() {
+    public void findSequencesBFS() { // Using out Sequence Structure as a Queue
         Map <String, Node> mapValues = this.getValues(this.startingWord);
         Map.Entry<String, Node> firstEntry = mapValues.entrySet().iterator().next();
         String partOfSpeech1 = firstEntry.getValue().partOfSpeech1;
@@ -87,7 +87,7 @@ public class Parser {
         }
     }
 
-    public void findSequencesDFS(){
+    public void findSequencesDFS(){ // Using our Sequence Structure as a Stack
         Map <String, Node> mapValues = this.getValues(this.startingWord);
         Map.Entry<String, Node> firstEntry = mapValues.entrySet().iterator().next();
         String partOfSpeech1 = firstEntry.getValue().partOfSpeech1;
@@ -129,8 +129,33 @@ public class Parser {
         System.out.println("DFS Search");
     }
 
-    public void findSequencesHS(){
-        System.out.println("HS Search");
+    public Sequence findSequencesHS() { // Greedy Approach
+        Map<String, Node> mapValues = this.getValues(this.startingWord);
+        Map.Entry<String, Node> firstEntry = mapValues.entrySet().iterator().next();
+        String partOfSpeech1 = firstEntry.getValue().partOfSpeech1;
+
+        float greatestProbabilitySoFar = 0;
+        String nextWordSoFar = "";
+        Node nextNodeSoFar = null;
+        ArrayList<Float> probabilityArray = new ArrayList<>();
+        Sequence s = new Sequence(this.startingWord, partOfSpeech1, 1, 1, probabilityArray);
+
+        for (int i = 1; i < sentenceSpec.length; i++){
+            for (Map.Entry<String, Node> entry : mapValues.entrySet()) {
+                if (sentenceSpec[i].equals(entry.getValue().partOfSpeech2)) {
+                    nodesConsidered++;
+                    if (entry.getValue().probability > greatestProbabilitySoFar) {
+                        greatestProbabilitySoFar = entry.getValue().probability;
+                        nextWordSoFar = entry.getKey();
+                        nextNodeSoFar = entry.getValue();
+                    }
+                }
+            }
+            s = s.addWordToSequence(nextWordSoFar, nextNodeSoFar.partOfSpeech2, nextNodeSoFar.probability);
+            greatestProbabilitySoFar = 0;
+            mapValues = this.getValues(nextWordSoFar);
+        }
+        return s;
     }
 
     public float getProbability(String word1, String word2) {
