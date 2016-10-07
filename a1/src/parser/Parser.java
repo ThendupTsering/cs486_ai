@@ -74,7 +74,8 @@ public class Parser {
         if (partOfSpeech1.equals(this.sentenceSpec[0])) {
             for (int i = 0; i < this.sentenceSpec.length-1; i++) {
                 if (i == 0) {
-                    Sequence s = new Sequence(this.startingWord, partOfSpeech1, 1, 1);
+                    ArrayList<Float> probabilityArray = new ArrayList<>();
+                    Sequence s = new Sequence(this.startingWord, partOfSpeech1, 1, 1, probabilityArray);
                     this.parseFromLastWord(s);
                 } else {
                     ArrayList<Sequence> currentSequences = new ArrayList<>(this.validSequences);
@@ -87,20 +88,44 @@ public class Parser {
     }
 
     public void findSequencesDFS(){
-//        Map <String, Node> mapValues = this.getValues(this.startingWord);
-//        Map.Entry<String, Node> firstEntry = mapValues.entrySet().iterator().next();
-//        String partOfSpeech1 = firstEntry.getValue().partOfSpeech1;
-//        Stack<Sequence> sequenceStack = new Stack<Sequence>();
-//
-//        if (partOfSpeech1.equals(this.sentenceSpec[0])) {
-//            for (int i = 0; i < this.sentenceSpec.length-1; i++) {
-//                if (i == 0) {
-//                    Sequence s = new Sequence(this.startingWord, partOfSpeech1, 1, 1);
-//                    sequenceStack.push(s);
-//                }
-//                //sequenceStack.push()
-//            }
-//        }
+        Map <String, Node> mapValues = this.getValues(this.startingWord);
+        Map.Entry<String, Node> firstEntry = mapValues.entrySet().iterator().next();
+        String partOfSpeech1 = firstEntry.getValue().partOfSpeech1;
+
+        ArrayList<Float> probabilityArray = new ArrayList<>();
+        Sequence s = new Sequence(this.startingWord, partOfSpeech1, 1, 1, probabilityArray);
+        ArrayList<Integer> levelCounters = new ArrayList<>();
+        for (int i = 0; i < this.sentenceSpec.length; i++) {
+            levelCounters.add(0);
+        }
+
+        while (s.level <= this.sentenceSpec.length) {
+            int levelCountersIndex = s.level-1;
+            System.out.println("While Loop Start, Level: " + s.level + ", Counter: " + levelCounters.get(levelCountersIndex));
+            ArrayList<String> word2s = this.getNextWords(s.lastWord);
+            if (s.level == this.sentenceSpec.length-1 && levelCounters.get(s.level) == word2s.size()) {
+                break;
+            }
+            if (word2s.size() > 0) {
+                String word2 = word2s.get(levelCounters.get(s.level));
+
+                float probabilityOfWord2 = this.getProbability(s.lastWord, word2);
+                s = s.addWordToSequence(word2, this.getPartOfSpeech2(s.lastWord, word2), probabilityOfWord2);
+                System.out.println("Added \"" + s.lastWord + "\" to our stack");
+            } else {
+                System.out.println("Removing \'" + s.lastWord + "\" from our stack");
+                s.removeWordFromSequence();
+                levelCounters.set(levelCountersIndex, levelCounters.get(levelCountersIndex)+1);
+            }
+
+            if (s.level == this.sentenceSpec.length){
+                s.removeWordFromSequence();
+                levelCounters.set(levelCountersIndex, levelCounters.get(levelCountersIndex)+1);
+            }
+            System.out.println("While Loop End, Level " + s.level + ", Counter: " + levelCounters.get(levelCountersIndex));
+            s.printSequence();
+        }
+
         System.out.println("DFS Search");
     }
 
@@ -116,7 +141,16 @@ public class Parser {
 //        return this.mapMain.get(word1).get(word2).partOfSpeech1;
 //    }
 
-    public String getPartOfSpeech2(String word1, String word2) {
+    public float multiplyProbArray(ArrayList<Float> arr) {
+        float prob = 1;
+        for (float p: arr) {
+            prob = prob * p;
+        }
+        return prob;
+    }
+
+
+        public String getPartOfSpeech2(String word1, String word2) {
         return this.mapMain.get(word1).get(word2).partOfSpeech2;
     }
 
@@ -140,7 +174,8 @@ public class Parser {
     public void parseFromLastWord(Sequence seq) {
         ArrayList <String> word2List = this.getNextWords(seq.lastWord);
         for (String word2: word2List) {
-            Sequence s = new Sequence(seq.sentence, seq.sentenceSpec, seq.level, seq.probability);
+            ArrayList<Float> probabilityArray = new ArrayList<>();
+            Sequence s = new Sequence(seq.sentence, seq.sentenceSpec, seq.level, seq.probability, probabilityArray);
             float probabilityOfWord2 = this.getProbability(seq.lastWord, word2);
             s = s.addWordToSequence(word2, this.getPartOfSpeech2(seq.lastWord, word2), probabilityOfWord2);
             if (isSequenceValid(s)) {
@@ -159,7 +194,8 @@ public class Parser {
     }
 
     public Sequence getBestSequence(int level) {
-        Sequence best = new Sequence("TTAV", "TT-AV", -1, 0);
+        ArrayList<Float> probabilityArray = new ArrayList<>();
+        Sequence best = new Sequence("TTAV", "TT-AV", -1, 0, probabilityArray);
         float probSoFar = 0;
         for(Sequence s: this.validSequences) {
             if (s.level == level && s.probability > probSoFar) {
