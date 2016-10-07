@@ -99,34 +99,39 @@ public class Parser {
             levelCounters.add(0);
         }
 
-        while (s.level <= this.sentenceSpec.length) {
-            int levelCountersIndex = s.level-1;
-            System.out.println("While Loop Start, Level: " + s.level + ", Counter: " + levelCounters.get(levelCountersIndex));
-            ArrayList<String> word2s = this.getNextWords(s.lastWord);
-            if (s.level == this.sentenceSpec.length-1 && levelCounters.get(s.level) == word2s.size()) {
-                break;
-            }
-            if (word2s.size() > 0) {
-                String word2 = word2s.get(levelCounters.get(s.level));
-
-                float probabilityOfWord2 = this.getProbability(s.lastWord, word2);
-                s = s.addWordToSequence(word2, this.getPartOfSpeech2(s.lastWord, word2), probabilityOfWord2);
-                System.out.println("Added \"" + s.lastWord + "\" to our stack");
+        boolean goneThroughAll = false;
+        while (!goneThroughAll) {
+            if (s.level == this.sentenceSpec.length) {
+                if (this.isSequenceValid(s)) {
+                    Sequence seq = new Sequence(s.sentence, s.sentenceSpec, s.level, s.probability, s.probabilityArray);
+                    this.validSequences.add(seq);
+                }
+                s.removeWordFromSequence();
+                levelCounters.set(s.level, levelCounters.get(s.level)+1);
             } else {
-                System.out.println("Removing \'" + s.lastWord + "\" from our stack");
-                s.removeWordFromSequence();
-                levelCounters.set(levelCountersIndex, levelCounters.get(levelCountersIndex)+1);
-            }
+                ArrayList<String> word2s = this.getNextWords(s.lastWord);
+                if (word2s.size() > 0) {
+                    if (levelCounters.get(s.level) >= word2s.size()) {
+                        if (s.level == 1) {
+                            goneThroughAll = true;
+                        } else {
+                            s.removeWordFromSequence();
+                            levelCounters.set(s.level+1, 0);
+                            levelCounters.set(s.level, levelCounters.get(s.level)+1);
+                        }
+                    } else {
+                        String word2 = word2s.get(levelCounters.get(s.level));
+                        float probabilityOfWord2 = this.getProbability(s.lastWord, word2);
+                        s = s.addWordToSequence(word2, this.getPartOfSpeech2(s.lastWord, word2), probabilityOfWord2);
+                    }
 
-            if (s.level == this.sentenceSpec.length){
-                s.removeWordFromSequence();
-                levelCounters.set(levelCountersIndex, levelCounters.get(levelCountersIndex)+1);
+                } else {
+                    s.removeWordFromSequence();
+                    levelCounters.set(s.level, levelCounters.get(s.level)+1);
+                }
             }
-            System.out.println("While Loop End, Level " + s.level + ", Counter: " + levelCounters.get(levelCountersIndex));
-            s.printSequence();
         }
 
-        System.out.println("DFS Search");
     }
 
     public Sequence findSequencesHS() { // Greedy Approach
